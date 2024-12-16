@@ -2,6 +2,26 @@ local MySQL = exports.oxmysql -- Use oxmysql for database queries
 
 local playerLicenses = {}  -- Table to store player licenses
 
+
+-- Ensure the table exists when the resource starts
+AddEventHandler('onResourceStart', function(resourceName)
+    if GetCurrentResourceName() == resourceName then
+        print("^2Checking for 'player_identifiers' table existence...^0")
+        MySQL:execute([[
+            CREATE TABLE IF NOT EXISTS `player_identifiers` (
+                `id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `license` VARCHAR(50) NOT NULL COLLATE 'utf8mb3_general_ci',
+                `discord` VARCHAR(50) NOT NULL COLLATE 'utf8mb3_general_ci',
+                PRIMARY KEY (`id`) USING BTREE,
+                UNIQUE INDEX `license` (`license`) USING BTREE
+            ) COLLATE='utf8mb3_general_ci' ENGINE=InnoDB;
+        ]], {}, function()
+            print("^2Table 'player_identifiers' checked/created successfully.^0")
+        end)
+    end
+end)
+
+
 -- Store the player's license when they join
 AddEventHandler('playerJoining', function()
     local src = source
